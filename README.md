@@ -27,6 +27,8 @@ $ yarn add just-sketch
 
 - picture synthesis:
     ```js
+    // Specifies the type of the exported picture
+    sketch.imageType = 'png';
     sketch()
     .import(imageURL)
     .join(anotherURL)
@@ -50,6 +52,8 @@ $ yarn add just-sketch
 ### APIs
 
 - `sketch([width: Number, height: Number])`: `width` and `height` is optional, if they are passed in, then the size of exported base64 picture will depend on them. Otherwise, it will depend on the natural size of the imported picture in `.import()`
+
+- `sketch.imageType`: The type(`png`, `jpeg`) of exported base64 picture.(`jpeg` by default)
 
 - `.import(imageURL: String)`: The size of the imported picture will determine the size of the final exported base64 picture.
 
