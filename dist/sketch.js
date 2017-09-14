@@ -143,7 +143,7 @@ sketch.prototype.export = function () {
                 context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, offsetX, offsetY, width, height);
             });
             try {
-                output(_this.canvas.toDataURL(sketch.imageType || 'image/jpeg'), context, _this.canvas);
+                output(_this.canvas.toDataURL('image/' + (sketch.imageType || 'jpeg')), context, _this.canvas);
             } catch (error) {
                 setTimeout(function () {
                     return _this.catch(error);

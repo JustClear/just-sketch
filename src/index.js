@@ -92,7 +92,7 @@ sketch.prototype.export = function (output = function () {}) {
                 context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, offsetX , offsetY , width, height);
             });
             try {
-                output(this.canvas.toDataURL(sketch.imageType || 'image/jpeg'), context, this.canvas);
+                output(this.canvas.toDataURL(`image/${sketch.imageType || 'jpeg'}`), context, this.canvas);
             } catch (error) {
                 setTimeout(() => this.catch(error), 0);
             }
