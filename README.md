@@ -20,12 +20,12 @@ $ yarn add just-sketch
 
 ```js
 sketch()
-.import(imageURL)
-.join(qrCodeURL, {
+.import(imageURL) // import picture
+.join(qrCodeURL, { // join qr code watermark
     width: 100,
     right: 40,
     bottom: 20,
-}).rect({
+}).rect({ // draw frame
     top: 280,
     left: 310,
     width: 120,
