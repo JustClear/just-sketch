@@ -12,6 +12,31 @@ convert image to base64. Of course, you can also join images before convert.
 $ yarn add just-sketch
 ```
 
+## Using Scenes
+
+- add watermark or frame.
+
+![result](./result.png)
+
+```js
+sketch()
+.import(imageURL)
+.join(qrCodeURL, {
+    width: 100,
+    right: 40,
+    bottom: 20,
+}).rect({
+    top: 280,
+    left: 310,
+    width: 120,
+    height: 120,
+    borderWidth: 1,
+    borderColor: `red`,
+}).export(base64 => {
+    document.querySelector('.js-image').src = base64;
+});
+```
+
 ## Usage
 
 - convert image to base64:
