@@ -22,7 +22,7 @@ $ yarn add just-sketch
     .import(imageURL)
     .export(base64 => {
         // get base64 here...
-    });
+    }).catch(error => console.log(error));
     ```
 
 - picture synthesis:
@@ -33,9 +33,10 @@ $ yarn add just-sketch
     .import(imageURL)
     .join(anotherURL)
     .export(base64 => {
-        // get base64 here...
+        // get png base64 here...
     });
-    // call `.join()` by chaining to join multi image
+
+    // call `.join()` by chaining to join multi images
     sketch()
     .import(imageURL)
     .join(anotherURL, {
@@ -69,7 +70,9 @@ $ yarn add just-sketch
 
 **NOTE:** Only **adjacent** sides position are accepted.
 
-- `.export(callback: Function)`: Export base64 picture.
+- `.export((base64, context, canvas) => {})`: Export base64 picture, or use `context` and `canvas` to do whatever you can.
+
+- `.catch(error => {})`: try catch export.
 
 
 ## License
