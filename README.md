@@ -93,6 +93,12 @@ sketch()
         - `options.bottom`: as you known.
         - `options.left`: as you known.
 
+- `.rect(options: Object)`: Join rectangle frame.
+    - based on `.join()` options, the following options are added:
+        - `options.borderWidth:`: as you known.
+        - `options.borderColor:`: as you known.
+        - `options.backgroundColor:`: as you known.
+
 **NOTE:** Only **adjacent** sides position are accepted.
 
 - `.export((base64, context, canvas) => {})`: Export base64 picture, or use `context` and `canvas` to do whatever you can.
