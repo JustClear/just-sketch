@@ -79,6 +79,14 @@ sketch.prototype.join = function () {
     return this;
 };
 
+sketch.prototype.rect = function () {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    options.type = 'rect';
+    this.symbols.push(options);
+    return this;
+};
+
 sketch.prototype.export = function () {
     var _this = this;
 
@@ -90,18 +98,22 @@ sketch.prototype.export = function () {
 
         _this.width = _this.width || background.naturalWidth;
         _this.height = _this.height || background.naturalHeight;
-        var context = _this.initCanvas(_this.width, _this.height);
-        context.drawImage(background, 0, 0, _this.width, _this.height);
+        _this.initCanvas(_this.width, _this.height);
+        _this.ctx.drawImage(background, 0, 0, _this.width, _this.height);
 
         preload(_this.symbols.map(function (symbol) {
-            return symbol.image;
+            return symbol.image || '';
         }), function (images) {
             images.map(function (image, index) {
                 var option = _this.symbols[index];
-                var top = option.top,
-                    right = option.right,
-                    bottom = option.bottom,
-                    left = option.left;
+                var _option$top = option.top,
+                    top = _option$top === undefined ? 0 : _option$top,
+                    _option$right = option.right,
+                    right = _option$right === undefined ? 0 : _option$right,
+                    _option$bottom = option.bottom,
+                    bottom = _option$bottom === undefined ? 0 : _option$bottom,
+                    _option$left = option.left,
+                    left = _option$left === undefined ? 0 : _option$left;
 
                 var width = void 0,
                     height = void 0,
@@ -123,27 +135,43 @@ sketch.prototype.export = function () {
                 } else {
                     console.log('joined symbol size error');
                 }
-                if (left && top) {
+                if (left !== 0 && top !== 0) {
                     offsetX = left;
                     offsetY = top;
-                } else if (left && bottom) {
+                } else if (left !== 0 && bottom !== 0) {
                     offsetX = left;
                     offsetY = _this.height - (height + bottom);
-                } else if (right && top) {
+                } else if (right !== 0 && top !== 0) {
                     offsetX = _this.width - (width + right);
                     offsetY = top;
-                } else if (right && bottom) {
+                } else if (right !== 0 && bottom !== 0) {
                     offsetX = _this.width - (width + right);
                     offsetY = _this.height - (height + bottom);
                 } else {
                     console.log('symbol position error: only adjacent sides position are accepted');
                 }
+                width = width || 0;
+                height = height || 0;
                 offsetX = offsetX || 0;
                 offsetY = offsetY || 0;
-                context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, offsetX, offsetY, width, height);
+                if (option.type == 'rect') {
+                    if (option.backgroundColor) {
+                        _this.ctx.fillStyle = option.backgroundColor || '#000';
+                        _this.ctx.fillRect(offsetX + option.borderWidth, offsetY + option.borderWidth, width, height);
+                    }
+                    if (option.borderWidth) {
+                        _this.ctx.beginPath();
+                        _this.ctx.lineWidth = option.borderWidth;
+                        _this.ctx.strokeStyle = option.borderColor || '#000';
+                        _this.ctx.rect(offsetX + option.borderWidth, offsetY + option.borderWidth, width, height);
+                        _this.ctx.stroke();
+                    }
+                } else {
+                    _this.ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, offsetX, offsetY, width, height);
+                }
             });
             try {
-                output(_this.canvas.toDataURL('image/' + (sketch.imageType || 'jpeg')), context, _this.canvas);
+                output(_this.canvas.toDataURL('image/' + (sketch.imageType || 'jpeg')), _this.ctx, _this.canvas);
             } catch (error) {
                 setTimeout(function () {
                     return _this.catch(error);
