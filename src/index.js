@@ -52,10 +52,11 @@ sketch.prototype.rect = function (options = {}) {
 
 sketch.prototype.export = function (output = function () {}) {
     preload(this.background, ([background]) => {
+        this.naturalRatio = background.naturalHeight / background.naturalWidth;
         this.width = this.width || background.naturalWidth;
         this.height = this.height || background.naturalHeight;
         this.initCanvas(this.width, this.height);
-        this.ctx.drawImage(background, 0, 0, this.width, this.height);
+        this.ctx.drawImage(background, 0, 0, this.width, this.width * this.naturalRatio);
 
         preload(this.symbols.map(symbol => symbol.image || ''), (images) => {
             images.map((image, index) => {
