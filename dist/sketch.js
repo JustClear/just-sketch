@@ -96,10 +96,11 @@ sketch.prototype.export = function () {
         var _ref2 = _slicedToArray(_ref, 1),
             background = _ref2[0];
 
+        _this.naturalRatio = background.naturalHeight / background.naturalWidth;
         _this.width = _this.width || background.naturalWidth;
         _this.height = _this.height || background.naturalHeight;
         _this.initCanvas(_this.width, _this.height);
-        _this.ctx.drawImage(background, 0, 0, _this.width, _this.height);
+        _this.ctx.drawImage(background, 0, 0, _this.width, _this.width * _this.naturalRatio);
 
         preload(_this.symbols.map(function (symbol) {
             return symbol.image || '';

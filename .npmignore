@@ -8,3 +8,6 @@ yarn.lock
 .eslintrc
 .eslintignore
 .gitignore
+demo.jpg
+qr-code.png
+result.jpg
