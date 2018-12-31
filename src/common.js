@@ -54,3 +54,37 @@ export function getSize(node) {
 
     return result[type];
 }
+
+export function getCoordinate(canvas, imageSize, position) {
+    const POSITION_STRING = ['center', 'left-top', 'right-top', 'right-bottom', 'left-bottom'];
+    if (!POSITION_STRING.includes(position)) console.log(`Invalid position string.\nExcept [${POSITION_STRING}]`);
+
+    const { width: imageWidth, height: imageHeight } = imageSize;
+    const { width: canvasWidth, height: canvasHeight } = canvas;
+    const offsetX = canvasWidth - imageWidth;
+    const offsetY = canvasHeight - imageHeight;
+    const result = {
+        [POSITION_STRING[0]]: {
+            x: offsetX / 2,
+            y: offsetY / 2,
+        },
+        [POSITION_STRING[1]]: {
+            x: 0,
+            y: 0,
+        },
+        [POSITION_STRING[2]]: {
+            x: offsetX,
+            y: 0,
+        },
+        [POSITION_STRING[3]]: {
+            x: offsetX,
+            y: offsetY,
+        },
+        [POSITION_STRING[4]]: {
+            x: 0,
+            y: offsetY,
+        },
+    };
+
+    return result[position];
+}
