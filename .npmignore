@@ -11,3 +11,5 @@ yarn.lock
 demo.jpg
 qr-code.png
 result.jpg
+.travis.yml
+yarn-error.log

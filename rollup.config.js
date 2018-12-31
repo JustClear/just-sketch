@@ -1,26 +1,29 @@
-import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
-import sourcemaps from 'rollup-plugin-sourcemaps';
+import buble from 'rollup-plugin-buble';
+import alias from 'rollup-plugin-alias';
+import minify from 'rollup-plugin-babel-minify';
 import resolve from 'rollup-plugin-node-resolve';
 
-const packages = require('./package.json');
-const fileName = process.env.NODE_ENV === 'development' ? `sketch` : `sketch.min`;
+const isProd = process.env.NODE_ENV === 'production';
+
 const configure = {
-    entry: `src/index.js`,
-    moduleName: packages.moduleName,
-    moduleId: packages.moduleName,
-    sourceMap: true,
-    targets: [{
-        dest: `dist/${fileName}.js`,
+    input: 'src/index.js',
+    output: {
+        file: 'dist/sketch.js',
+        name: 'sketch',
         format: 'umd',
-    }],
+        sourcemap: true,
+    },
     plugins: [
-        babel(),
-        sourcemaps(),
+        alias(),
+        buble(),
         resolve(),
     ],
+    external: [],
 };
 
-if (process.env.NODE_ENV === 'production') configure.plugins.push(uglify());
+if (isProd) {
+    configure.output.file = 'dist/sketch.min.js';
+    configure.plugins.push(minify());
+}
 
-export default configure;
+module.exports = configure;
