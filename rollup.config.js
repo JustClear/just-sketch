@@ -14,7 +14,9 @@ const configure = {
         sourcemap: true,
     },
     plugins: [
-        alias(),
+        alias({
+            common: './common',
+        }),
         buble(),
         resolve(),
     ],
