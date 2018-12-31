@@ -4,26 +4,61 @@
     global.sketch = factory();
 }(typeof self !== 'undefined' ? self : this, function () { 'use strict';
 
-    function preload(imageURLs, done) {
+    function preload(imageURLs) {
         var images = [];
-        var count = 0;
+        var count = 0,
+            doneAction = function () {},
+            progressAction = function () {};
+
         imageURLs = (typeof imageURLs != 'object') ? [imageURLs] : imageURLs;
 
-        imageURLs.length === 0 && done(images);
+        imageURLs.length === 0 && doneAction(images);
 
-        imageURLs.map(function (imageURL) {
-            var image = new Image();
-            image.src = imageURL;
-            image.crossOrigin = '*';
-            image.addEventListener('load', imageOnLoad);
-            image.addEventListener('error', imageOnLoad);
-            images.push(image);
+        imageURLs.map(function (image, i) {
+            images[i] = new Image();
+            images[i].src = image;
+            images[i].onload = imageLoad;
+            images[i].onerror = imageLoad;
         });
 
-        function imageOnLoad() {
-            count ++;
-            if (count == imageURLs.length) { done(images); }
+        function imageLoad() {
+            progressAction((count + 1) * 100 / images.length, images[count]);
+            count++;
+            if (count == imageURLs.length) { doneAction(imageURLs.length === 1 ? images[0] : images); }
         }
+
+        return {
+            done: function done() {
+                doneAction = arguments[0] || doneAction;
+            },
+            progress: function progress() {
+                progressAction = arguments[0] || progressAction;
+            },
+        };
+    }
+
+    function getSize(node) {
+        if (!node.tagName) { return console.log('Invalid element.'); }
+
+        var name = node.tagName;
+        var type = name === 'IMG' ? 'image' : (name === 'CANVAS' ? 'canvas' : 'normal');
+
+        var result = {
+            image: {
+                width: node.naturalWidth,
+                height: node.naturalHeight,
+            },
+            canvas: {
+                width: node.width,
+                height: node.height,
+            },
+            normal: {
+                width: node.offsetWidth,
+                height: node.offsetHeight,
+            },
+        };
+
+        return result[type];
     }
 
     function sketch() {
@@ -39,133 +74,57 @@
         var width = arguments[0];
         var height = arguments[1];
 
-        if (typeof width === 'number' && typeof height === 'number') {
-            this.width = width;
-            this.height = height;
-        }
-
-        this.symbols = [];
-        this.catch = function() {};
-    };
-
-    sketch.prototype.initCanvas = function (width, height) {
         this.canvas = document.createElement('canvas');
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.ctx = this.canvas.getContext('2d');
-        return this.ctx;
+        this.context = this.canvas.getContext('2d');
+        this.width = width;
+        this.height = height;
+        this.sprites = [];
+        this.actions = [];
     };
 
-    sketch.prototype.import = function (image) {
-        if (typeof image === 'string') {
-            this.background = image;
-        } else {
-            console.log('.import(): import unknown type.');
-        }
-        return this;
-    };
-
-    sketch.prototype.join = function (image, options) {
-        if ( image === void 0 ) image = '';
-        if ( options === void 0 ) options = {};
-
-        if (typeof image === 'string') {
-            options.image = image;
-            this.symbols.push(options);
-        } else {
-            console.log('.join(): join unknown type.');
-        }
-        return this;
-    };
-
-    sketch.prototype.rect = function (options) {
-        if ( options === void 0 ) options = {};
-
-        options.type = 'rect';
-        this.symbols.push(options);
-        return this;
-    };
-
-    sketch.prototype.export = function (output) {
+    sketch.prototype.import = function (imageURL) {
         var this$1 = this;
-        if ( output === void 0 ) output = function () {};
 
-        preload(this.background, function (ref) {
-            var background = ref[0];
-
-            this$1.naturalRatio = background.naturalHeight / background.naturalWidth;
-            this$1.width = this$1.width || background.naturalWidth;
-            this$1.height = this$1.height || background.naturalHeight;
-            this$1.initCanvas(this$1.width, this$1.height);
-            this$1.ctx.drawImage(background, 0, 0, this$1.width, this$1.width * this$1.naturalRatio);
-
-            preload(this$1.symbols.map(function (symbol) { return symbol.image || ''; }), function (images) {
-                images.map(function (image, index) {
-                    var option = this$1.symbols[index];
-                    var top = option.top; if ( top === void 0 ) top = 0;
-                    var right = option.right; if ( right === void 0 ) right = 0;
-                    var bottom = option.bottom; if ( bottom === void 0 ) bottom = 0;
-                    var left = option.left; if ( left === void 0 ) left = 0;
-                    var width, height, offsetX, offsetY;
-                    option.ratio = image.naturalHeight / image.naturalWidth;
-                    if (option.width && option.height == undefined) {
-                        width = option.width;
-                        height = width * option.ratio;
-                    } else if (option.height && option.width == undefined) {
-                        height = option.height;
-                        width = height / option.ratio;
-                    } else if (option.width && option.height) {
-                        width = option.width;
-                        height = option.height;
-                    } else if (option.height == undefined && option.width == undefined) {
-                        width = image.naturalWidth;
-                        height = image.naturalHeight;
-                    } else {
-                        console.log('joined symbol size error');
-                    }
-                    if (left !== 0 && top !== 0) {
-                        offsetX = left;
-                        offsetY = top;
-                    } else if (left !== 0 && bottom !== 0) {
-                        offsetX = left;
-                        offsetY = this$1.height - (height + bottom);
-                    } else if (right !== 0 && top !== 0) {
-                        offsetX = this$1.width - (width + right);
-                        offsetY = top;
-                    } else if (right !== 0 && bottom !== 0) {
-                        offsetX = this$1.width - (width + right);
-                        offsetY = this$1.height - (height + bottom);
-                    } else {
-                        console.log('symbol position error: only adjacent sides position are accepted');
-                    }
-                    width = width || 0;
-                    height = height || 0;
-                    offsetX = offsetX || 0;
-                    offsetY = offsetY || 0;
-                    if (option.type == 'rect') {
-                        if (option.backgroundColor) {
-                            this$1.ctx.fillStyle = option.backgroundColor || '#000';
-                            this$1.ctx.fillRect(offsetX + option.borderWidth, offsetY + option.borderWidth, width, height);
-                        }
-                        if (option.borderWidth) {
-                            this$1.ctx.beginPath();
-                            this$1.ctx.lineWidth = option.borderWidth;
-                            this$1.ctx.strokeStyle = option.borderColor || '#000';
-                            this$1.ctx.rect(offsetX + option.borderWidth, offsetY + option.borderWidth, width, height);
-                            this$1.ctx.stroke();
-                        }
-                    } else {
-                        this$1.ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, offsetX , offsetY , width, height);
-                    }
-                });
-                try {
-                    output(this$1.canvas.toDataURL(("image/" + (sketch.imageType || 'jpeg'))), this$1.ctx, this$1.canvas);
-                } catch (error) {
-                    setTimeout(function () { return this$1.catch(error); }, 0);
-                }
+        this.actions.push(function () {
+            preload(imageURL).done(function (image) {
+                var ref = getSize(image);
+                var width = ref.width;
+                var height = ref.height;
+                this$1.canvas.width = width;
+                this$1.canvas.height = height;
+                this$1.context.drawImage(image, 0, 0);
+                this$1.next();
             });
         });
         return this;
+    };
+
+    sketch.prototype.push = function (options) {
+        var this$1 = this;
+        if ( options === void 0 ) options = {};
+
+        this.actions.push(function () {
+            preload(options.image).done(function (image) {
+                var ref = getSize(image);
+                var width = ref.width;
+                var height = ref.height;
+                this$1.context.drawImage(image, 0, 0, width, height);
+                this$1.next();
+            });
+        });
+        return this;
+    };
+
+    sketch.prototype.next = function () {
+        this.actions.length === 0 ? this.done() : this.actions.shift()();
+    };
+
+    sketch.prototype.export = function (output) {
+        this.done = function () {
+            var base = this.canvas.toDataURL('image/jpeg');
+            output(base);
+        };
+        this.next(this.context);
     };
 
     return sketch;
