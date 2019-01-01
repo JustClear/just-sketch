@@ -88,3 +88,19 @@ export function getCoordinate(canvas, imageSize, position) {
 
     return result[position];
 }
+
+export function getRotatedSize(imageSize, rotate) {
+    rotate = Math.abs(rotate) % 90;
+    const { width: _width, height: _height } = imageSize;
+    const HYPOTENUSE =  Math.round(Math.sqrt(Math.pow(_width, 2) + Math.pow(_height, 2)));
+    const ANGLE = Math.atan(_height / _width) * 180 / Math.PI;
+    const angleA = Math.abs(ANGLE - rotate) * Math.PI / 180;
+    const angleB = Math.abs(90 - ANGLE - rotate) * Math.PI / 180;
+    const width = Math.round(HYPOTENUSE * Math.cos(angleA));
+    const height = Math.round(HYPOTENUSE * Math.cos(angleB));
+
+    return {
+        width,
+        height,
+    };
+}

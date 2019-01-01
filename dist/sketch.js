@@ -96,6 +96,23 @@
         return result[position];
     }
 
+    function getRotatedSize(imageSize, rotate) {
+        rotate = Math.abs(rotate) % 90;
+        var _width = imageSize.width;
+        var _height = imageSize.height;
+        var HYPOTENUSE =  Math.round(Math.sqrt(Math.pow(_width, 2) + Math.pow(_height, 2)));
+        var ANGLE = Math.atan(_height / _width) * 180 / Math.PI;
+        var angleA = Math.abs(ANGLE - rotate) * Math.PI / 180;
+        var angleB = Math.abs(90 - ANGLE - rotate) * Math.PI / 180;
+        var width = Math.round(HYPOTENUSE * Math.cos(angleA));
+        var height = Math.round(HYPOTENUSE * Math.cos(angleB));
+
+        return {
+            width: width,
+            height: height,
+        };
+    }
+
     function sketch() {
         var i = arguments.length, argsArray = Array(i);
         while ( i-- ) argsArray[i] = arguments[i];
@@ -155,19 +172,23 @@
                     };
                     var spriteCanvas = document.createElement('canvas');
                     var spriteContext = spriteCanvas.getContext('2d');
+                    var rotatedSize = getRotatedSize(imageSize, rotate);
 
-                    spriteCanvas.width = imageSize.width;
-                    spriteCanvas.height = imageSize.height;
+                    spriteCanvas.width = rotatedSize.width;
+                    spriteCanvas.height = rotatedSize.height;
+
+                    var diffWidth = Math.abs(rotatedSize.width - imageSize.width);
+                    var diffHeight = Math.abs(rotatedSize.height - imageSize.height);
+
+                    // spriteContext.rect(0, 0, spriteCanvas.width, spriteCanvas.height);
+                    // spriteContext.stroke();
 
                     spriteContext.translate(spriteCanvas.width / 2, spriteCanvas.height / 2);
                     spriteContext.rotate(rotate * Math.PI / 180);
                     spriteContext.translate(-spriteCanvas.width / 2, -spriteCanvas.height / 2);
-                    spriteContext.drawImage(image, spriteCanvas.width / 2 - image.width / 2, spriteCanvas.height / 2 - image.height / 2);
-                    spriteContext.translate(spriteCanvas.width / 2, spriteCanvas.height / 2);
-                    spriteContext.rotate(-rotate * Math.PI / 180);
-                    spriteContext.translate(-spriteCanvas.width / 2, -spriteCanvas.height / 2);
+                    spriteContext.drawImage(image, (spriteCanvas.width - image.width) / 2, (spriteCanvas.height - image.height) / 2);
 
-                    this$1.context.drawImage(spriteCanvas, 0, 0, spriteCanvas.width, spriteCanvas.height, coordinate$1.x, coordinate$1.y, spriteCanvas.width, spriteCanvas.height);
+                    this$1.context.drawImage(spriteCanvas, 0, 0, spriteCanvas.width, spriteCanvas.height, coordinate$1.x - (diffWidth / 2), coordinate$1.y - (diffHeight / 2), spriteCanvas.width, spriteCanvas.height);
                 } else {
                     console.log('`options.position` should be a string or object');
                 }

@@ -1,4 +1,4 @@
-import { preload, getSize, getCoordinate } from 'common';
+import { preload, getSize, getCoordinate, getRotatedSize } from 'common';
 
 export default function sketch() {
     if (!(this instanceof sketch)) return new sketch(...arguments);
@@ -47,19 +47,23 @@ sketch.prototype.push = function (options = {}) {
                 };
                 const spriteCanvas = document.createElement('canvas');
                 const spriteContext = spriteCanvas.getContext('2d');
+                const rotatedSize = getRotatedSize(imageSize, rotate);
 
-                spriteCanvas.width = imageSize.width;
-                spriteCanvas.height = imageSize.height;
+                spriteCanvas.width = rotatedSize.width;
+                spriteCanvas.height = rotatedSize.height;
+
+                const diffWidth = Math.abs(rotatedSize.width - imageSize.width);
+                const diffHeight = Math.abs(rotatedSize.height - imageSize.height);
+
+                // spriteContext.rect(0, 0, spriteCanvas.width, spriteCanvas.height);
+                // spriteContext.stroke();
 
                 spriteContext.translate(spriteCanvas.width / 2, spriteCanvas.height / 2);
                 spriteContext.rotate(rotate * Math.PI / 180);
                 spriteContext.translate(-spriteCanvas.width / 2, -spriteCanvas.height / 2);
-                spriteContext.drawImage(image, spriteCanvas.width / 2 - image.width / 2, spriteCanvas.height / 2 - image.height / 2);
-                spriteContext.translate(spriteCanvas.width / 2, spriteCanvas.height / 2);
-                spriteContext.rotate(-rotate * Math.PI / 180);
-                spriteContext.translate(-spriteCanvas.width / 2, -spriteCanvas.height / 2);
+                spriteContext.drawImage(image, (spriteCanvas.width - image.width) / 2, (spriteCanvas.height - image.height) / 2);
 
-                this.context.drawImage(spriteCanvas, 0, 0, spriteCanvas.width, spriteCanvas.height, coordinate.x, coordinate.y, spriteCanvas.width, spriteCanvas.height);
+                this.context.drawImage(spriteCanvas, 0, 0, spriteCanvas.width, spriteCanvas.height, coordinate.x - (diffWidth / 2), coordinate.y - (diffHeight / 2), spriteCanvas.width, spriteCanvas.height);
             } else {
                 console.log('`options.position` should be a string or object');
             }
