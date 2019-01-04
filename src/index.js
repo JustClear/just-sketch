@@ -34,36 +34,38 @@ sketch.prototype.push = function (options = {}) {
 
     this.actions.push(() => {
         preload(options.image).done(image => {
-            const imageSize = getSize(image);
+            // const imageSize = getSize(image);
             const type = typeof position;
             if (type === 'string') {
-                const coordinate = getCoordinate(this.canvas, imageSize, position);
-                this.context.drawImage(image, 0, 0, imageSize.width, imageSize.height, coordinate.x, coordinate.y, imageSize.width, imageSize.height);
+                const coordinate = getCoordinate(this.canvas, image, position);
+                this.context.drawImage(image, 0, 0, image.width, image.height, coordinate.x, coordinate.y, image.width, image.height);
             } else if(type == 'object') {
                 const rotate = position.rotate || 0;
                 const coordinate = {
                     x: position.x || 0,
                     y: position.y || 0,
                 };
-                const spriteCanvas = document.createElement('canvas');
-                const spriteContext = spriteCanvas.getContext('2d');
-                const rotatedSize = getRotatedSize(imageSize, rotate);
+                const rotateCoordinate = {
+                    x: coordinate.x + image.width / 2,
+                    y: coordinate.y + image.height / 2,
+                };
+                // const spriteCanvas = document.createElement('canvas');
+                // const spriteContext = spriteCanvas.getContext('2d');
+                // const rotatedSize = getRotatedSize(imageSize, rotate);
 
-                spriteCanvas.width = rotatedSize.width;
-                spriteCanvas.height = rotatedSize.height;
+                // spriteCanvas.width = rotatedSize.width;
+                // spriteCanvas.height = rotatedSize.height;
 
-                const diffWidth = Math.abs(rotatedSize.width - imageSize.width);
-                const diffHeight = Math.abs(rotatedSize.height - imageSize.height);
+                // const diffWidth = Math.abs(rotatedSize.width - imageSize.width);
+                // const diffHeight = Math.abs(rotatedSize.height - imageSize.height);
 
-                // spriteContext.rect(0, 0, spriteCanvas.width, spriteCanvas.height);
-                // spriteContext.stroke();
+                // this.context.rect(0, 0, image.width, image.height);
+                // this.context.stroke();
 
-                spriteContext.translate(spriteCanvas.width / 2, spriteCanvas.height / 2);
-                spriteContext.rotate(rotate * Math.PI / 180);
-                spriteContext.translate(-spriteCanvas.width / 2, -spriteCanvas.height / 2);
-                spriteContext.drawImage(image, (spriteCanvas.width - image.width) / 2, (spriteCanvas.height - image.height) / 2);
-
-                this.context.drawImage(spriteCanvas, 0, 0, spriteCanvas.width, spriteCanvas.height, coordinate.x - (diffWidth / 2), coordinate.y - (diffHeight / 2), spriteCanvas.width, spriteCanvas.height);
+                this.context.translate(rotateCoordinate.x, rotateCoordinate.y);
+                this.context.rotate(rotate * Math.PI / 180);
+                this.context.translate(-rotateCoordinate.x, -rotateCoordinate.y);
+                this.context.drawImage(image, 0, 0, image.width, image.height, coordinate.x, coordinate.y, image.width, image.height);
             } else {
                 console.log('`options.position` should be a string or object');
             }
