@@ -1,4 +1,4 @@
-import { preload, getSize, getCoordinate, getRotatedSize } from 'common';
+import { preload, getSize, getCoordinate } from 'common';
 
 export default function sketch() {
     if (!(this instanceof sketch)) return new sketch(...arguments);
@@ -6,14 +6,18 @@ export default function sketch() {
 }
 
 sketch.prototype.init = function () {
-    const [width, height] = arguments;
-
+    const [width, height, backgroundColor] = arguments;
+    const defaultColor = '#000';
+    this.actions = [];
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
     this.width = width;
     this.height = height;
-    this.sprites = [];
-    this.actions = [];
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.context.fillStyle = backgroundColor || defaultColor;
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.fillStyle = defaultColor;
 };
 
 sketch.prototype.import = function (imageURL) {
